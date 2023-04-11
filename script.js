@@ -1,137 +1,83 @@
-//your code here
-const checkbox = document.getElementById("checkbox");
-const submitBtn = document.querySelector("button[type=submit]");
+function shuffle(array) {
+  var currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
 
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
 
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
 
-checkbox.disabled= true;
-submitBtn.disabled = true;
-
-
-const elements = document.querySelectorAll(".element");
-const SelectColor = document.getElementById("SelectColor")
-
-function getRandomColor(){
-    const  letter  = "1234567890ABCDEF";//your JS code here. If required.
-let image = [];
-for (let i = 0; i < 5; i++) {
-    let t = document.createElement("IMG");
-    t.setAttribute("data-ns-test", `img${i + 1}`);
-    t.width = 100;
-    t.height = 100;
-    t.onclick = (e) => captchaClick(e);
-    t.src = `images/${i + 1}.jpg`;
-    image.push(t);
-}
-let temp = Math.floor(Math.random() * 5);
-let t = document.createElement("IMG");
-t.setAttribute("data-ns-test", `img${temp + 1}`);
-t.width = 100;
-t.height = 100;
-t.onclick = (e) => captchaClick(e);
-t.src = `images/${temp + 1}.jpg`;
-image.push(t);
-image.sort(() => Math.random() - 0.5);
-for (let i = 0; i < 6; i++) {
-    document.getElementById("main").appendChild(image[i]);
+  return array;
 }
 
-let captcha = [];
-function clearCaptcha() {
-    // console.log("Clearing captcha");
-    for (let i = 0; i < 6; i++) {
-        image[i].onclick = (e) => captchaClick(e);
-    }
-    captcha = [];
-    try {
-        document.getElementById("para").remove();
-    } catch (e) { }
-    try {
-        document.getElementById("btn").remove();
-    } catch (e) { }
-    try {
-        document.getElementById("reset").remove();
-    } catch (e) { }
-}
+var arr = ["img1", "img2", "img3", "img4", "img5"];
+shuffle(arr);
 
-function captchaClick(e) {
-    console.log(e.target.attributes["data-ns-test"].nodeValue);
-    captcha.push(e.target.attributes["data-ns-test"].nodeValue);
-    e.target.onclick = () => { };
-    // console.log(captcha);
-
-    if (captcha.length === 1) {
-        let p = document.createElement("button");
-        p.id = "reset";
-        p.innerHTML = "Reset";
-        p.onclick = () => {
-            clearCaptcha();
-        };
-        document.getElementById("main").appendChild(p);
-    }
-
-    if (captcha.length === 2) {
-        let t = document.createElement("button");
-        t.id = "btn";
-        t.innerHTML = "Verify";
-        t.onclick = () => {
-            captchaVerify();
-        };
-        document.getElementById("main").appendChild(t);
-    } else if (captcha.length > 2) {
-        try {
-            document.getElementById("btn").remove();
-        } catch (e) { }
-    }
-    try {
-        document.getElementById("para").remove();
-    } catch (e) { }
-}
-
-function captchaVerify() {
-    if (captcha.length === 2 && captcha[0] === captcha[1]) {
-        let t = document.createElement("P");
-        t.innerHTML = "You are a human. Congratulations!";
-        t.id = "para";
-        document.getElementById("main").appendChild(t);
-    } else {
-        let t = document.createElement("P");
-        t.innerHTML =
-            "We can't verify you as a human. You selected the non-identical tiles.";
-        t.id = "para";
-        document.getElementById("main").appendChild(t);
-    }
-    document.getElementById("btn").remove();
-}
-    let color = "#"
-    for (let i = 0; i <6; i++){
-        color += letter[Math.floor(Math.random() *16)];
-    }
-    return color;
-    
-    
- }
-let colorArray= [];
-elements.forEach (function (element){
-const color = getRandomColor();
-colorArray.push(color);
-element.style.backgroundColor = color;
+const repeat = Math.floor(Math.random() * (arr.length - 1));
+const at = Math.floor(Math.random() * (arr.length - 1));
+const element = arr[repeat];
+arr.splice(at, 0, element);
+console.log(arr);
+const div = document.getElementById("images");
+arr.forEach((img) => {
+  div.innerHTML += `<img class="${img}"/>`;
 });
 
+let selected = [];
+const verify_btn = document.getElementById("verify");
+verify_btn.style.display = "none";
+verify_btn.onclick = verify;
 
-SelectColor.innetHTML =
- colorArray[Math.floor(Math.random()* colorArray.length)];
- 
- elements.forEach((element)=> {
- element.addEventListener("click", () => {
-         if (element.innerHTML === SelectColor.innerHTML) {
-             alert("You are Human");
-             checkbox.checked = true;
-             submitBtn.disabled = false;
-             submitBtn.classList.remove("btn-light");
-             submitBtn.classList.add("btn-success");
-         }
-         else {
-             alert("Please verify you are human");
-         }
-     })});
+function verify() {
+  if (selected.length == 2) {
+    if (selected[0] == selected[1]) {
+      para.innerHTML = "You are a human. Congratulations!";
+    } else {
+      para.innerHTML =
+        "We can't verify you as a human. You selected the non-identical tiles.";
+    }
+    verify_btn.style.display = "none";
+  }
+}
+
+const images = document.querySelectorAll("img");
+const para = document.getElementById("para");
+images.forEach((img) => {
+  img.addEventListener("click", () => {
+    reset_btn.style.display = "block";
+    if (img.classList.contains("selected")) {
+      return;
+    } else img.classList.add("selected");
+    if (img.classList.contains("selected")) {
+      selected.push(img.classList[0]);
+    }
+    if (selected.length == 2) {
+      verify_btn.style.display = "block";
+    } else {
+      verify_btn.style.display = "none";
+    }
+  });
+});
+
+const reset_btn = document.getElementById("reset");
+reset_btn.style.display = "none";
+
+function reset() {
+  selected = [];
+  images.forEach((img) => {
+    img.classList.remove("selected");
+  });
+  para.innerHTML = "";
+  reset_btn.style.display = "none";
+  verify_btn.style.display = "none";
+}
+
+reset_btn.onclick = reset;
